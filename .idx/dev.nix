@@ -5,7 +5,8 @@
   channel = "stable-24.05"; # or "unstable"
   # Use https://search.nixos.org/packages to find packages
   packages = [
-    pkgs.nodejs_20
+    pkgs.pnpm
+    pkgs.nodejs_latest
   ];
   # Sets environment variables in the workspace
   env = {};
@@ -29,7 +30,7 @@
       enable = true;
       previews = {
         web = {
-          command = ["npm" "run" "dev" "--" "--port" "$PORT" "--host" "0.0.0.0"];
+          command = ["pnpm" "run" "dev"];
           manager = "web";
         };
       };
