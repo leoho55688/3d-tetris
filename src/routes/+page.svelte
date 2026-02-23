@@ -1,20 +1,15 @@
 <script lang="ts">
   import { Tetris } from '@/components/tetris'
-
-  let name = 'World'
 </script>
 
-<div class="flex h-full items-center justify-center">
-  <Tetris />
-
-  <h1>Hello {name}!</h1>
+<div
+  class="flex h-full w-full flex-col items-center justify-evenly lg:flex-row"
+>
+  <div class="info-container flex w-full grow-3 flex-col items-center p-4">
+    <h1 class="text-6xl font-thin text-blue-800 uppercase">Clear one line!</h1>
+    <p></p>
+  </div>
+  <div class="tetris-container flex w-full grow-2 justify-center p-4">
+    <Tetris />
+  </div>
 </div>
-
-<style>
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4em;
-    font-weight: 100;
-  }
-</style>

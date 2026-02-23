@@ -41,44 +41,106 @@
   let cubeCanvas: HTMLCanvasElement
   let errorMessage: string | null = null
 
+  let touchStartX = 0
+  let touchStartY = 0
+  let touchEndX = 0
+  let touchEndY = 0
+
   const handleKeydown = (e: KeyboardEvent) => {
     switch (e.key) {
       case 'ArrowLeft':
-        if (!isAtLeftWall(activeBlockArray)) {
-          activeBlockArray = activeBlockArray.map((val) => val - 1)
-        }
+        moveLeft()
         break
       case 'ArrowRight':
-        if (!isAtRightWall(activeBlockArray)) {
-          activeBlockArray = activeBlockArray.map((val) => val + 1)
-        }
+        moveRight()
         break
       case 'ArrowUp':
-        rotateBlock(activeBlockType, activeBlockState, activeBlockArray)
-        activeBlockState = (activeBlockState + 1) % 4
+        rotateClockwise()
         break
       case 'ArrowDown':
-        if (
-          !(
-            isAtBottom(activeBlockArray) ||
-            collision(blockStateArray, activeBlockArray)
-          )
-        ) {
-          activeBlockArray = activeBlockArray.map((num) => num - 10)
-        }
+        moveDown()
         break
       case ' ':
-        while (
-          !(
-            isAtBottom(activeBlockArray) ||
-            collision(blockStateArray, activeBlockArray)
-          )
-        ) {
-          activeBlockArray = activeBlockArray.map((num) => num - 10)
-        }
+        drop()
         break
       default:
         break
+    }
+  }
+
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartX = e.changedTouches[0].screenX
+    touchStartY = e.changedTouches[0].screenY
+  }
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    touchEndX = e.changedTouches[0].screenX
+    touchEndY = e.changedTouches[0].screenY
+    handleGesture()
+  }
+
+  const handleGesture = () => {
+    const deltaX = touchEndX - touchStartX
+    const deltaY = touchEndY - touchStartY
+
+    const tapThreshold = 10
+    const swipeThreshold = 50
+
+    if (Math.abs(deltaX) < tapThreshold && Math.abs(deltaY) < tapThreshold) {
+      rotateClockwise()
+      return
+    }
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Horizontal swipe
+      if (Math.abs(deltaX) > swipeThreshold) {
+        if (deltaX > 0) {
+          moveRight()
+        } else {
+          moveLeft()
+        }
+      }
+    } else {
+      // Vertical swipe
+      if (deltaY > swipeThreshold) {
+        // A long swipe down for drop
+        drop()
+      }
+    }
+  }
+
+  const moveLeft = () => {
+    if (!isAtLeftWall(activeBlockArray)) {
+      activeBlockArray = activeBlockArray.map((val) => val - 1)
+    }
+  }
+
+  const moveRight = () => {
+    if (!isAtRightWall(activeBlockArray)) {
+      activeBlockArray = activeBlockArray.map((val) => val + 1)
+    }
+  }
+
+  const rotateClockwise = () => {
+    rotateBlock(activeBlockType, activeBlockState, activeBlockArray)
+    activeBlockState = (activeBlockState + 1) % 4
+  }
+
+  const moveDown = () => {
+    if (
+      !isAtBottom(activeBlockArray) &&
+      !collision(blockStateArray, activeBlockArray)
+    ) {
+      activeBlockArray = activeBlockArray.map((num) => num - 10)
+    }
+  }
+
+  const drop = () => {
+    while (
+      !isAtBottom(activeBlockArray) &&
+      !collision(blockStateArray, activeBlockArray)
+    ) {
+      activeBlockArray = activeBlockArray.map((num) => num - 10)
     }
   }
 
@@ -255,7 +317,7 @@
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     })
 
-    const orthoMatrix = mat4.ortho(-256, 256, -512, 512, -150, 150)
+    const orthoMatrix = mat4.ortho(-256, 256, -512, 512, -200, 200)
     const viewMatrixArray = new Float32Array(4 * 4 * BOARD_COL * BOARD_ROW)
 
     function getTransformationMatrix() {
@@ -400,6 +462,11 @@
   {#if errorMessage}
     <div class="error">{errorMessage}</div>
   {:else}
-    <canvas class="h-full w-full" bind:this={cubeCanvas}></canvas>
+    <canvas
+      class="h-full w-full touch-none"
+      bind:this={cubeCanvas}
+      on:touchstart={handleTouchStart}
+      on:touchend={handleTouchEnd}
+    ></canvas>
   {/if}
 </div>
