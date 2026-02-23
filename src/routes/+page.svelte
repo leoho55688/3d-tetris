@@ -1,23 +1,16 @@
 <script lang="ts">
-  import ModeToggleButton from "../components/ModeToggleButton.svelte"
+  import { Tetris } from '@/components/tetris'
 
   let name = 'World'
 </script>
 
-<main>
-  <h1>Hello {name}!</h1>
+<div class="flex h-full items-center justify-center">
+  <Tetris />
 
-  <ModeToggleButton />
-</main>
+  <h1>Hello {name}!</h1>
+</div>
 
 <style>
-  main {
-    text-align: center;
-    padding: 1em;
-    max-width: 240px;
-    margin: 0 auto;
-  }
-
   h1 {
     color: #ff3e00;
     text-transform: uppercase;
