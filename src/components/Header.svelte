@@ -5,21 +5,29 @@
   import ModeToggleButton from './ModeToggleButton.svelte'
 </script>
 
-<header class="flex h-16 items-center border-b px-4">
+<header class="test-xs flex h-16 items-center border-b lg:px-4">
   <div class="logo-container"></div>
   <NavigationMenu.Root>
     <NavigationMenu.List>
       <NavigationMenu.Item>
         <NavigationMenu.Link>
           {#snippet child()}
-            <a href="/" class={navigationMenuTriggerStyle()}>home</a>
+            <a href="/" class={navigationMenuTriggerStyle()}>HOME</a>
           {/snippet}
         </NavigationMenu.Link>
       </NavigationMenu.Item>
       <NavigationMenu.Item>
         <NavigationMenu.Link>
           {#snippet child()}
-            <a href="/about" class={navigationMenuTriggerStyle()}>about</a>
+            <a href="/about" class={navigationMenuTriggerStyle()}>ABOUT</a>
+          {/snippet}
+        </NavigationMenu.Link>
+      </NavigationMenu.Item>
+      <NavigationMenu.Item>
+        <NavigationMenu.Link>
+          {#snippet child()}
+            <a href="/contract" class={navigationMenuTriggerStyle()}>CONTRACT</a
+            >
           {/snippet}
         </NavigationMenu.Link>
       </NavigationMenu.Item>

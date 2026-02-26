@@ -10,8 +10,8 @@
     cubeVertexSize,
   } from './cube'
 
-  import vert from './vert.wgsl?raw'
-  import frag from './frag.wgsl?raw'
+  import vert from './shaders/vert.wgsl?raw'
+  import frag from './shaders/frag.wgsl?raw'
   import {
     clearLine,
     collision,
@@ -346,27 +346,27 @@
     let diff = 0
     let prev = Date.now()
 
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const canvas = entry.target as HTMLCanvasElement
-        const width = entry.contentBoxSize[0].inlineSize
-        const height = entry.contentBoxSize[0].blockSize
-        canvas.width = Math.max(
-          1,
-          Math.min(width, device.limits.maxTextureDimension2D)
-        )
-        canvas.height = Math.max(
-          1,
-          Math.min(height, device.limits.maxTextureDimension2D)
-        )
-        depthTexture = device.createTexture({
-          size: [canvas.width, canvas.height],
-          format: 'depth24plus',
-          usage: GPUTextureUsage.RENDER_ATTACHMENT,
-        })
-      }
-    })
-    observer.observe(cubeCanvas)
+    // const observer = new ResizeObserver((entries) => {
+    //   for (const entry of entries) {
+    //     const canvas = entry.target as HTMLCanvasElement
+    //     const width = entry.contentBoxSize[0].inlineSize
+    //     const height = entry.contentBoxSize[0].blockSize
+    //     canvas.width = Math.max(
+    //       1,
+    //       Math.min(width, device.limits.maxTextureDimension2D)
+    //     )
+    //     canvas.height = Math.max(
+    //       1,
+    //       Math.min(height, device.limits.maxTextureDimension2D)
+    //     )
+    //     depthTexture = device.createTexture({
+    //       size: [canvas.width, canvas.height],
+    //       format: 'depth24plus',
+    //       usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    //     })
+    //   }
+    // })
+    // observer.observe(cubeCanvas)
 
     function frame() {
       let curr = Date.now()
@@ -444,17 +444,17 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="tetris-container relative h-165 w-85 bg-black p-2.5">
+<div class="tetris-container relative h-197 w-101 bg-black p-2.5">
   {#if isCleared}
     <div
-      class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex h-160 w-80 items-center justify-center backdrop-blur-sm"
+      class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex h-192 w-96 items-center justify-center backdrop-blur-sm"
     >
       <div class="message text-4xl font-bold text-white">Line Cleared!</div>
     </div>
   {/if}
   {#if gameOver}
     <div
-      class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex h-160 w-80 items-center justify-center backdrop-blur-sm"
+      class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex h-192 w-96 items-center justify-center backdrop-blur-sm"
     >
       <div class="message text-4xl font-bold text-white">Game Over</div>
     </div>
