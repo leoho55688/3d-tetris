@@ -114,8 +114,13 @@ const writeBoard = (
   })
 }
 
-const clearLine = (blockState: Int32Array): boolean => {
+const clearLine = (blockState: Int32Array): number => {
   return hasFullRow(blockState)
+}
+
+const removeLine = (blockState: Int32Array, lineCleared: number) => {
+  blockState.copyWithin(lineCleared * 10, lineCleared * 10 + 10)
+  blockState.fill(-1, -10)
 }
 
 export {
@@ -128,4 +133,5 @@ export {
   collision,
   writeBoard,
   clearLine,
+  removeLine,
 }

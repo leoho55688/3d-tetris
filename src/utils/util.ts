@@ -1,7 +1,7 @@
 function hasFullRow(
   flatArray: number[] | Int32Array,
   rowSize: number = 10
-): boolean {
+): number {
   for (let i = 0; i < flatArray.length; i += rowSize) {
     let isFull = true
     for (let j = 0; j < rowSize; j++) {
@@ -11,9 +11,9 @@ function hasFullRow(
       }
     }
 
-    if (isFull) return true
+    if (isFull) return i / rowSize
   }
-  return false
+  return -1
 }
 
 function shuffleWithIndex<T>(
