@@ -14,7 +14,7 @@ const config = {
     adapter: adapter(),
     alias: {
       '@': './src',
-      'icons': 'node_modules/@lucide/svelte/icons'
+      icons: 'node_modules/@lucide/svelte/icons',
     },
   },
 }

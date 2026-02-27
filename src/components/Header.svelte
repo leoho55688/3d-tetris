@@ -26,8 +26,7 @@
       <NavigationMenu.Item>
         <NavigationMenu.Link>
           {#snippet child()}
-            <a href="/contract" class={navigationMenuTriggerStyle()}>CONTRACT</a
-            >
+            <a href="/bus" class={navigationMenuTriggerStyle()}>BUS</a>
           {/snippet}
         </NavigationMenu.Link>
       </NavigationMenu.Item>
