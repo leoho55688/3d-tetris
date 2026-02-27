@@ -1,4 +1,5 @@
 import { get } from '@/lib/api'
+import { Ok, Err, type Result } from '@/utils/result'
 
 interface busStop {
   stop: string
@@ -7,13 +8,6 @@ interface busStop {
   name_sc: string
   lat: string
   long: string
-}
-
-interface busStopResponse {
-  type: string
-  version: string
-  generated_timestamp: string
-  data: busStop[]
 }
 
 interface busRoute {
@@ -28,29 +22,16 @@ interface busRoute {
   dest_sc: string
 }
 
-interface busRouteRespose {
-  type: string
-  version: string
-  generated_timestamp: string
-  data: busRoute[]
-}
-
 interface busRouteStop {
   route: string
   bound: string
   service_type: string
   seq: string
   stop: string
+  stop_name?: string
 }
 
-interface busRouteStopResponse {
-  type: string
-  version: string
-  generated_timestamp: string
-  data: busRouteStop[]
-}
-
-interface eta {
+interface busETA {
   co: string
   route: string
   dir: string
@@ -67,35 +48,111 @@ interface eta {
   data_timestamp: string
 }
 
-interface etaResponse {
+interface busAPIResponse<T> {
   type: string
   version: string
   generated_timestamp: string
-  data: eta[]
+  data: T
 }
 
-const etaAPIRoot = 'https://data.etabus.gov.hk/v1/transport/kmb'
+const busAPIRoot = 'https://data.etabus.gov.hk/v1/transport/kmb'
 
-const getStopList = async (): Promise<busStop[]> => {
-  const res: busStopResponse = await get<busStopResponse>(etaAPIRoot + '/stop')
-  return res.data
+const getStopList = async (): Promise<Result<busStop[]>> => {
+  const res: Result<busAPIResponse<busStop[]>> = await get<
+    busAPIResponse<busStop[]>
+  >(busAPIRoot + '/stop')
+
+  if (res.ok) {
+    return Ok(res.value.data)
+  }
+  return res
 }
 
-const getRouteList = async (): Promise<busRoute[]> => {
-  const res: busRouteRespose = await get<busRouteRespose>(etaAPIRoot + '/route')
-  return res.data
+const getStop = async (stop_id: string): Promise<Result<busStop>> => {
+  const res: Result<busAPIResponse<busStop>> = await get<
+    busAPIResponse<busStop>
+  >(busAPIRoot + '/stop/' + stop_id)
+
+  if (res.ok) {
+    return Ok(res.value.data)
+  }
+  return res
 }
 
-const getRouteStopList = async (): Promise<busRouteStop[]> => {
-  const res: busRouteStopResponse = await get<busRouteStopResponse>(
-    etaAPIRoot + '/route-stop'
-  )
-  return res.data
+const getRouteList = async (): Promise<Result<busRoute[]>> => {
+  const res: Result<busAPIResponse<busRoute[]>> = await get<
+    busAPIResponse<busRoute[]>
+  >(busAPIRoot + '/route')
+
+  if (res.ok) {
+    return Ok(res.value.data)
+  }
+  return res
 }
 
-const getEta = async (): Promise<eta[]> => {
-  const res: etaResponse = await get<etaResponse>(etaAPIRoot + '/eta')
-  return res.data
+const getRoute = async (
+  route: string,
+  direction: string,
+  service_type: string = '1'
+): Promise<Result<busRoute>> => {
+  const res: Result<busAPIResponse<busRoute>> = await get<
+    busAPIResponse<busRoute>
+  >(busAPIRoot + '/route/' + route + '/' + direction + '/' + service_type)
+
+  if (res.ok) {
+    return Ok(res.value.data)
+  }
+  return res
 }
 
-export { getStopList }
+const getRouteStopList = async (): Promise<Result<busRouteStop[]>> => {
+  const res: Result<busAPIResponse<busRouteStop[]>> = await get<
+    busAPIResponse<busRouteStop[]>
+  >(busAPIRoot + '/route-stop')
+
+  if (res.ok) {
+    return Ok(res.value.data)
+  }
+  return res
+}
+
+const getRouteStop = async (
+  route: string,
+  direction: string,
+  service_type: string = '1'
+): Promise<Result<busRouteStop[]>> => {
+  const res: Result<busAPIResponse<busRouteStop[]>> = await get<
+    busAPIResponse<busRouteStop[]>
+  >(busAPIRoot + '/route-stop/' + route + '/' + direction + '/' + service_type)
+
+  if (res.ok) {
+    return Ok(res.value.data)
+  }
+  return res
+}
+
+const getETA = async (
+  stop_id: string,
+  route: string,
+  service_type: string = '1'
+): Promise<Result<busETA[]>> => {
+  const res: Result<busAPIResponse<busETA[]>> = await get<
+    busAPIResponse<busETA[]>
+  >(busAPIRoot + '/eta/' + stop_id + '/' + route + '/' + service_type)
+
+  if (res.ok) {
+    return Ok(res.value.data)
+  }
+  return res
+}
+
+export {
+  getStopList,
+  getStop,
+  getRouteList,
+  getRoute,
+  getRouteStopList,
+  getRouteStop,
+  getETA,
+}
+export type { busStop, busRoute, busRouteStop, busETA }

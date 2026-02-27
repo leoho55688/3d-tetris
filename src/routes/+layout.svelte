@@ -10,7 +10,7 @@
 <ModeWatcher />
 <div class="flex min-h-screen flex-col">
   <Header />
-  <main class="flex flex-grow items-center justify-center">
+  <main class="flex flex-grow flex-col items-center justify-center">
     {#if children}
       {@render children()}
     {:else}

@@ -1,4 +1,5 @@
 import axios, { type AxiosResponse, AxiosError } from 'axios'
+import { Ok, Err, type Result } from '../utils/result'
 
 /**
  * Makes a GET request to a specified URL using axios.
@@ -6,16 +7,15 @@ import axios, { type AxiosResponse, AxiosError } from 'axios'
  * @template T The expected type of the response data.
  * @param {string} url The URL to make the GET request to.
  * @param {Record<string, any>} [params] Optional query parameters to include in the request.
- * @returns {Promise<T>} A promise that resolves with the response data.
- * @throws {Error} Throws an error if the request fails.
+ * @returns {Promise<Result<T, AxiosError>>} A promise that resolves with a Result type.
  */
 export async function get<T>(
   url: string,
   params?: Record<string, any>
-): Promise<T> {
+): Promise<Result<T, AxiosError>> {
   try {
     const response: AxiosResponse<T> = await axios.get(url, { params })
-    return response.data
+    return Ok(response.data)
   } catch (error) {
     const axiosError = error as AxiosError
     if (axiosError.response) {
@@ -31,6 +31,6 @@ export async function get<T>(
       // Something happened in setting up the request that triggered an Error
       console.error('Error:', axiosError.message)
     }
-    throw new Error('Failed to fetch data from the API.')
+    return Err(axiosError)
   }
 }

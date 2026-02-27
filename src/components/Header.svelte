@@ -5,7 +5,7 @@
   import ModeToggleButton from './ModeToggleButton.svelte'
 </script>
 
-<header class="test-xs flex h-16 items-center border-b lg:px-4">
+<header class="test-xs flex h-16 items-center border-b px-2 lg:px-4">
   <div class="logo-container"></div>
   <NavigationMenu.Root>
     <NavigationMenu.List>

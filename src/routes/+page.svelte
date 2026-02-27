@@ -9,15 +9,12 @@
 </svelte:head>
 
 <div
-  class="flex h-full w-full flex-col items-center justify-evenly lg:flex-row"
+  class="container mx-auto flex flex-grow flex-col justify-evenly justify-start px-4 py-8 lg:flex-row"
 >
-  <div class="info-container flex w-full grow-3 flex-col items-center p-4">
-    <h1 class="text-6xl font-thin text-blue-800 uppercase">
-      Cleared {clearedLines} line!
-    </h1>
-    <p></p>
-  </div>
-  <div class="tetris-container flex w-full grow-2 justify-center p-4">
+  <h1 class="mx-4 mb-4 text-4xl font-bold lg:grow-2">
+    Cleared {clearedLines} line!
+  </h1>
+  <div class="tetris-container flex w-full justify-center p-4 lg:grow-3">
     <Tetris bind:clearedLines />
   </div>
 </div>
