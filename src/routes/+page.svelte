@@ -5,16 +5,18 @@
 </script>
 
 <svelte:head>
-  <title>Leo's Home &#9829;</title>
+  <title>Leo's Home</title>
 </svelte:head>
 
 <div
-  class="container mx-auto flex flex-grow flex-col justify-evenly justify-start px-4 py-8 lg:flex-row"
+  class="container mx-auto flex grow flex-col justify-evenly justify-start lg:flex-row"
 >
-  <h1 class="mx-4 mb-4 text-4xl font-bold lg:grow-2">
-    Cleared {clearedLines} line!
-  </h1>
-  <div class="tetris-container flex w-full justify-center p-4 lg:grow-3">
+  <div class="flex flex-col justify-center lg:grow-2">
+    <h1 class="mx-4 mb-4 text-4xl font-bold">
+      Cleared {clearedLines} line!
+    </h1>
+  </div>
+  <div class="tetris-container flex items-center justify-center p-4 lg:grow-3">
     <Tetris bind:clearedLines />
   </div>
 </div>
