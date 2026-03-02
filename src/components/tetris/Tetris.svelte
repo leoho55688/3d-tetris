@@ -36,7 +36,6 @@
   let activeBlockState = 0
 
   let { clearedLines = $bindable() } = $props()
-  let isCleared = $state(false)
   let gameOver = $state(false)
 
   let cubeCanvas: HTMLCanvasElement | undefined = $state()
@@ -442,16 +441,9 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <div class="tetris-container relative h-197 w-101 bg-black p-2.5">
-  {#if isCleared}
-    <div
-      class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex h-192 w-96 items-center justify-center backdrop-blur-sm"
-    >
-      <div class="message text-4xl font-bold text-white">Line Cleared!</div>
-    </div>
-  {/if}
   {#if gameOver}
     <div
-      class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex h-192 w-96 items-center justify-center backdrop-blur-sm"
+      class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex h-192 w-90 items-center justify-center backdrop-blur-sm lg:w-96"
     >
       <div class="message text-4xl font-bold text-white">Game Over</div>
     </div>
