@@ -84,12 +84,7 @@
                 {#each busETAList as eta}
                   <div class="border-t py-4">
                     <p>
-                      {new Date(eta.eta).toLocaleTimeString('en-GB', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        // second: '2-digit',
-                        hour12: false,
-                      })}
+                      {Math.round(((new Date(eta.eta)).getTime() - Date.now()) / (1000 * 60))} minutes
                     </p>
                   </div>
                 {/each}

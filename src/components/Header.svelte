@@ -92,10 +92,10 @@
         </NavigationMenu.Link>
       </NavigationMenu.Item>
       <NavigationMenu.Item>
-        <NavigationMenu.Trigger class="submenu-trigger">
+        <NavigationMenu.Trigger>
           GAMES
         </NavigationMenu.Trigger>
-        <NavigationMenu.Content class="mt-1">
+        <NavigationMenu.Content class="mt-1 z-100">
           <ul
             class="grid w-[300px] gap-2 p-2 sm:w-[400px] md:w-[500px] md:grid-cols-2 lg:w-[600px]"
           >

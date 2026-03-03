@@ -55,7 +55,7 @@
   </div>
 
   {#if errorMessage}
-    <div class="error-container lg:m-50">
+    <div class="error-container m-4 lg:m-50">
       <h1>
         {errorMessage}
       </h1>
