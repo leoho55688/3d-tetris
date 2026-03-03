@@ -84,7 +84,9 @@
                 {#each busETAList as eta}
                   <div class="border-t py-4">
                     <p>
-                      {Math.round(((new Date(eta.eta)).getTime() - Date.now()) / (1000 * 60))} minutes
+                      {Math.round(
+                        (new Date(eta.eta).getTime() - Date.now()) / (1000 * 60)
+                      )} minutes
                     </p>
                   </div>
                 {/each}

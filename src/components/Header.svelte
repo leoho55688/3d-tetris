@@ -10,26 +10,49 @@
 
   const isMobile = new IsMobile()
 
-  const components: { title: string; href: string; description: string }[] = [
+  const headerItems: HeaderItemProps[] = [
     {
-      title: 'Tetris',
-      href: '/games/tetris',
-      description:
-        'A puzzle game where players rotate falling geometric blocks to clear complete horizontal lines.',
+      title: 'Home',
+      href: '/',
     },
     {
-      title: 'Minesweeper',
-      href: '/games/minesweeper',
-      description:
-        'A logic puzzle where players clear a grid by uncovering safe tiles and avoiding hidden mines.',
+      title: 'About',
+      href: '/about',
     },
     {
-      title: 'Chess',
-      href: '/games/chess',
-      description:
-        'A strategic board game where two players move sixteen pieces to checkmate the king.',
+      title: 'Bus',
+      href: '/bus',
+    },
+    {
+      title: 'Games',
+      list: [
+        {
+          title: 'Tetris',
+          href: '/games/tetris',
+          content:
+            'A puzzle game where players rotate falling geometric blocks to clear complete horizontal lines.',
+        },
+        {
+          title: 'Minesweeper',
+          href: '/games/minesweeper',
+          content:
+            'A logic puzzle where players clear a grid by uncovering safe tiles and avoiding hidden mines.',
+        },
+        {
+          title: 'Chess',
+          href: '/games/chess',
+          content:
+            'A strategic board game where two players move sixteen pieces to checkmate the king.',
+        },
+      ],
     },
   ]
+
+  type HeaderItemProps = {
+    title: string
+    href?: string
+    list?: ListItemProps[]
+  }
 
   type ListItemProps = HTMLAttributes<HTMLAnchorElement> & {
     title: string
@@ -47,68 +70,51 @@
 }: ListItemProps)}
   <li>
     <NavigationMenu.Link>
-      {#snippet child()}
-        <a
-          {href}
-          class={cn(
-            'block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-            className
-          )}
-          {...restProps}
-        >
-          <div class="text-sm leading-none font-medium">{title}</div>
-          <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {content}
-          </p>
-        </a>
-      {/snippet}
+      <a
+        {href}
+        class={cn(
+          'block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+          className
+        )}
+        {...restProps}
+      >
+        <div class="text-sm leading-none font-medium">{title}</div>
+        <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
+          {content}
+        </p>
+      </a>
     </NavigationMenu.Link>
   </li>
+{/snippet}
+
+{#snippet HeaderItem({ href, title, list }: HeaderItemProps)}
+  <NavigationMenu.Item>
+    {#if list}
+      <NavigationMenu.Trigger>{title}</NavigationMenu.Trigger>
+      <NavigationMenu.Content class="z-100 mt-1">
+        <ul
+          class="grid w-[300px] gap-2 p-2 sm:w-[400px] md:w-[500px] md:grid-cols-2 lg:w-[600px]"
+        >
+          {#each list as component, i (i)}
+            {@render ListItem(component)}
+          {/each}
+        </ul>
+      </NavigationMenu.Content>
+    {:else}
+      <NavigationMenu.Link>
+        <a {href} class={navigationMenuTriggerStyle()}>{title}</a>
+      </NavigationMenu.Link>
+    {/if}
+  </NavigationMenu.Item>
 {/snippet}
 
 <header class="flex h-16 items-center border-b px-2 lg:px-4">
   <div class="logo-container"></div>
   <NavigationMenu.Root viewport={isMobile.current}>
     <NavigationMenu.List>
-      <NavigationMenu.Item>
-        <NavigationMenu.Link>
-          {#snippet child()}
-            <a href="/" class={navigationMenuTriggerStyle()}>HOME</a>
-          {/snippet}
-        </NavigationMenu.Link>
-      </NavigationMenu.Item>
-      <NavigationMenu.Item>
-        <NavigationMenu.Link>
-          {#snippet child()}
-            <a href="/about" class={navigationMenuTriggerStyle()}>ABOUT</a>
-          {/snippet}
-        </NavigationMenu.Link>
-      </NavigationMenu.Item>
-      <NavigationMenu.Item>
-        <NavigationMenu.Link>
-          {#snippet child()}
-            <a href="/bus" class={navigationMenuTriggerStyle()}>BUS</a>
-          {/snippet}
-        </NavigationMenu.Link>
-      </NavigationMenu.Item>
-      <NavigationMenu.Item>
-        <NavigationMenu.Trigger>
-          GAMES
-        </NavigationMenu.Trigger>
-        <NavigationMenu.Content class="mt-1 z-100">
-          <ul
-            class="grid w-[300px] gap-2 p-2 sm:w-[400px] md:w-[500px] md:grid-cols-2 lg:w-[600px]"
-          >
-            {#each components as component, i (i)}
-              {@render ListItem({
-                href: component.href,
-                title: component.title,
-                content: component.description,
-              })}
-            {/each}
-          </ul>
-        </NavigationMenu.Content>
-      </NavigationMenu.Item>
+      {#each headerItems as item}
+        {@render HeaderItem(item)}
+      {/each}
     </NavigationMenu.List>
   </NavigationMenu.Root>
   <div class="flex-grow"></div>
