@@ -13,7 +13,9 @@
   let errorMessage = $state('')
 
   const onclick = async () => {
-    let inboundRouteRes = await getRoute(route, 'inbound')
+    const routeProcessed = route.toUpperCase()
+
+    let inboundRouteRes = await getRoute(routeProcessed, 'inbound')
     if (inboundRouteRes.ok) {
       inboundRoute = inboundRouteRes.value
     } else {
@@ -28,14 +30,12 @@
       errorMessage = ''
     }
 
-    let outboundRouteRes = await getRoute(route, 'outbound')
+    let outboundRouteRes = await getRoute(routeProcessed, 'outbound')
     if (outboundRouteRes.ok) {
       outboundRoute = outboundRouteRes.value
     } else {
       // todo
     }
-
-    console.log(inboundRoute)
   }
 </script>
 
