@@ -1,4 +1,6 @@
 <script lang="ts">
+  import Minesweeper from '@/components/minesweeper/Minesweeper.svelte'
+
   let clearedMines = 0
 </script>
 
@@ -14,7 +16,7 @@
       Cleared {clearedMines} mines!
     </h1>
   </div>
-  <div
-    class="tetris-container flex items-center justify-center p-4 lg:grow-3"
-  ></div>
+  <div class="tetris-container flex items-center justify-center p-4 lg:grow-3">
+    <Minesweeper bind:clearedMines />
+  </div>
 </div>

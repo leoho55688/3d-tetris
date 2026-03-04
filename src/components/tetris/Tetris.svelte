@@ -328,7 +328,7 @@
       const orthoMatrix = mat4.ortho(-256, 256, -512, 512, -200, 200)
       const viewMatrixArray = new Float32Array(4 * 4 * BOARD_COL * BOARD_ROW)
 
-      function getTransformationMatrix() {
+      const getTransformationMatrix = () => {
         let offset = 0
 
         const viewMatrix = mat4.identity()
@@ -354,7 +354,7 @@
       let diff = 0
       let prev = Date.now()
 
-      function frame() {
+      const frame = () => {
         let curr = Date.now()
         diff += curr - prev
         prev = curr
@@ -440,7 +440,9 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="tetris-container relative h-197 w-101 bg-black p-2.5">
+<div
+  class="tetris-container relative h-185 w-95 bg-black p-2.5 lg:h-197 lg:w-101"
+>
   {#if gameOver}
     <div
       class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex h-192 w-90 items-center justify-center backdrop-blur-sm lg:w-96"
