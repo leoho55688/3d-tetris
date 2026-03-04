@@ -183,7 +183,7 @@
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       })
 
-      const gridArray = new Float32Array([BOARD_COL, BOARD_ROW, 1, 1])
+      const gridArray = new Float32Array([BOARD_COL, BOARD_ROW])
       const gridBuffer = device.createBuffer({
         label: 'grid buffer',
         size: gridArray.byteLength,
