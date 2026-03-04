@@ -39,10 +39,9 @@
             'A logic puzzle where players clear a grid by uncovering safe tiles and avoiding hidden mines.',
         },
         {
-          title: 'Chess',
-          href: '/games/chess',
-          content:
-            'A strategic board game where two players move sixteen pieces to checkmate the king.',
+          title: 'Platform Jumper',
+          href: '/games/jump',
+          content: 'A 2d platform game developed and published by me.',
         },
       ],
     },
@@ -69,20 +68,17 @@
   ...restProps
 }: ListItemProps)}
   <li>
-    <NavigationMenu.Link>
-      <a
-        {href}
-        class={cn(
-          'block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-          className
-        )}
-        {...restProps}
-      >
-        <div class="text-sm leading-none font-medium">{title}</div>
-        <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
-          {content}
-        </p>
-      </a>
+    <NavigationMenu.Link
+      {href}
+      class={cn(
+        'block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+        className
+      )}
+    >
+      <div class="text-sm leading-none font-medium">{title}</div>
+      <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">
+        {content}
+      </p>
     </NavigationMenu.Link>
   </li>
 {/snippet}
@@ -101,8 +97,8 @@
         </ul>
       </NavigationMenu.Content>
     {:else}
-      <NavigationMenu.Link>
-        <a {href} class={navigationMenuTriggerStyle()}>{title}</a>
+      <NavigationMenu.Link {href} class={navigationMenuTriggerStyle()}>
+        {title}
       </NavigationMenu.Link>
     {/if}
   </NavigationMenu.Item>
