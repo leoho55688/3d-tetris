@@ -62,12 +62,10 @@
   onMount(async () => {
     busRouteData.clear()
 
-    for (const route of recentBusRoute.reverse()) {
+    for (const route of [...recentBusRoute].reverse()) {
       const routeProcessed = route.toUpperCase()
       await searchRotue(routeProcessed)
     }
-
-    console.log(busRouteData)
   })
 </script>
 
