@@ -1,6 +1,6 @@
 @fragment
 fn main(@builtin(position) coord : vec4<f32>) -> @location(0) vec4<f32> {
-  let cellSize = 32.0; // 32.0 pixels per cell
+  let cellSize = 24.0; // 24.0 pixels per cell
 
   // Determine the thickness of the grid lines (e.g., 1 pixel)
   let thickness = 1.0;

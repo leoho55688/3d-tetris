@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { initWebGPU } from '@/utils/webgpu'
-  import { setMines } from './minesweeper'
-  import { cellVertexArray } from './mine'
+  import { onMount } from 'svelte'
 
+  import { initWebGPU, loadTexture } from '@/utils/webgpu'
+
+  import { setMines, sweep } from './minesweeper'
+  import { cellVertexArray } from './mine'
   import cellVert from './shaders/cell.vert.wgsl?raw'
   import cellFrag from './shaders/cell.frag.wgsl?raw'
   import gridVert from './shaders/grid.vert.wgsl?raw'
@@ -11,16 +13,53 @@
   let { clearedMines = $bindable() } = $props()
   let gameOver = $state(false)
 
-  let mineCanvas: HTMLCanvasElement | undefined = $state()
+  let mineCanvas: HTMLCanvasElement | null = $state(null)
+  let canvasWidth = $state(0)
+  let canvasHeight = $state(0)
   let errorMessage: string | null = $state(null)
 
-  $effect(() => {
-    if (!mineCanvas) return
+  let BOARD_COL = $derived(canvasWidth / 24)
+  let BOARD_ROW = $derived(canvasHeight / 24)
 
+  let gridArray = $derived(new Float32Array([BOARD_COL, BOARD_ROW]))
+  let mineBoardArray = $derived(new Int32Array(BOARD_COL * BOARD_ROW))
+  let cellStatusArray = $derived(new Int32Array(BOARD_COL * BOARD_ROW))
+
+  const onclick = (e: MouseEvent) => {
+    e.preventDefault()
+
+    const offsetX = Math.floor(e.offsetX / 24)
+    const offsetY = Math.floor((768 - e.offsetY) / 24)
+
+    switch (e.button) {
+      case 0:
+        gameOver = sweep(
+          mineBoardArray,
+          cellStatusArray,
+          BOARD_COL,
+          BOARD_ROW,
+          { x: offsetX, y: offsetY }
+        )
+        break
+      case 1:
+        break
+      case 2:
+        break
+      default:
+        break
+    }
+  }
+
+  onMount(() => {
     let animationFrameId: number
 
     const main = async () => {
-      const gpuResult = await initWebGPU(mineCanvas!)
+      if (!mineCanvas) {
+        errorMessage = 'cannot find canvas element'
+        return
+      }
+
+      const gpuResult = await initWebGPU(mineCanvas)
       if (!gpuResult.ok) {
         errorMessage = gpuResult.error.message
         console.error(gpuResult.error)
@@ -30,17 +69,25 @@
       const { device, context, format } = gpuResult.value
       const devicePixelRatio = window.devicePixelRatio || 1
       const presentationSize = {
-        width: mineCanvas!.clientWidth * devicePixelRatio,
-        height: mineCanvas!.clientHeight * devicePixelRatio,
+        width: mineCanvas.clientWidth * devicePixelRatio,
+        height: mineCanvas.clientHeight * devicePixelRatio,
       }
-      mineCanvas!.width = presentationSize.width
-      mineCanvas!.height = presentationSize.height
+      mineCanvas.width = presentationSize.width
+      mineCanvas.height = presentationSize.height
       context.configure({ device, format, alphaMode: 'opaque' })
 
-      const BOARD_COL = mineCanvas!.width / 32
-      const BOARD_ROW = mineCanvas!.height / 32
+      const gridBuffer = device.createBuffer({
+        label: 'grid buffer',
+        size: gridArray.byteLength,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      })
+      device.queue.writeBuffer(gridBuffer, 0, gridArray)
 
-      const mineBoardArray = new Int32Array(BOARD_COL * BOARD_ROW)
+      const mineBoardBuffer = device.createBuffer({
+        label: 'mine board buffer',
+        size: mineBoardArray.byteLength,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+      })
       setMines(
         mineBoardArray,
         BOARD_COL,
@@ -49,13 +96,11 @@
         mineBoardArray.length / 4
       )
 
-      const gridArray = new Float32Array([BOARD_COL, BOARD_ROW])
-      const gridBuffer = device.createBuffer({
-        label: 'grid buffer',
-        size: gridArray.byteLength,
-        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      const cellStateBuffer = device.createBuffer({
+        label: 'cell status buffer',
+        size: cellStatusArray.byteLength,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
       })
-      device.queue.writeBuffer(gridBuffer, 0, gridArray)
 
       const cellBuffer = device.createBuffer({
         size: cellVertexArray.byteLength,
@@ -71,6 +116,16 @@
             visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
             buffer: { type: 'uniform' },
           },
+          {
+            binding: 1,
+            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+            buffer: { type: 'read-only-storage' },
+          },
+          {
+            binding: 2,
+            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+            buffer: { type: 'read-only-storage' },
+          },
         ],
       })
       const uniformBindGroup = device.createBindGroup({
@@ -78,6 +133,38 @@
         layout: bindGroupLayout,
         entries: [
           { binding: 0, resource: gridBuffer },
+          { binding: 1, resource: mineBoardBuffer },
+          { binding: 2, resource: cellStateBuffer },
+        ],
+      })
+
+      const sampler = device.createSampler({
+        magFilter: 'nearest',
+        minFilter: 'nearest',
+      })
+
+      const texture = await loadTexture(device, '/minesweeper_sprite_sheet.png')
+
+      const textureBindGroupLayout = device.createBindGroupLayout({
+        entries: [
+          {
+            binding: 0,
+            visibility: GPUShaderStage.FRAGMENT,
+            texture: {},
+          },
+          {
+            binding: 1,
+            visibility: GPUShaderStage.FRAGMENT,
+            sampler: {},
+          },
+        ],
+      })
+
+      const textureBindGroup = device.createBindGroup({
+        layout: textureBindGroupLayout,
+        entries: [
+          { binding: 0, resource: texture.createView() },
+          { binding: 1, resource: sampler },
         ],
       })
 
@@ -98,7 +185,7 @@
 
       const pipelineLayout = device.createPipelineLayout({
         label: 'cell pipeline layout',
-        bindGroupLayouts: [bindGroupLayout],
+        bindGroupLayouts: [bindGroupLayout, textureBindGroupLayout],
       })
       const cellPipeline = device.createRenderPipeline({
         label: 'cell pipeline',
@@ -140,14 +227,18 @@
           ],
         }
 
+        device.queue.writeBuffer(mineBoardBuffer, 0, mineBoardArray)
+        device.queue.writeBuffer(cellStateBuffer, 0, cellStatusArray)
+
         const commandEncoder = device.createCommandEncoder()
         const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor)
         passEncoder.setPipeline(gridPipeline)
         passEncoder.draw(3)
         passEncoder.setPipeline(cellPipeline)
         passEncoder.setBindGroup(0, uniformBindGroup)
+        passEncoder.setBindGroup(1, textureBindGroup)
         passEncoder.setVertexBuffer(0, cellBuffer)
-        passEncoder.draw(4)
+        passEncoder.draw(cellVertexArray.length / 2, BOARD_COL * BOARD_ROW)
         passEncoder.end()
         device.queue.submit([commandEncoder.finish()])
 
@@ -180,6 +271,12 @@
   {#if errorMessage}
     <div class="error">{errorMessage}</div>
   {:else}
-    <canvas class="h-full w-full touch-none" bind:this={mineCanvas}></canvas>
+    <canvas
+      class="h-full w-full cursor-pointer touch-none"
+      bind:this={mineCanvas}
+      bind:clientWidth={canvasWidth}
+      bind:clientHeight={canvasHeight}
+      {onclick}
+    ></canvas>
   {/if}
 </div>

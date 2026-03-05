@@ -28,4 +28,21 @@ const setMines = (
   }
 }
 
-export { setMines }
+const flag = (status: Int32Array, col: number, row: number, cell: { x: number; y: number }) => {
+  status[cell.y * col + cell.x] = 2
+}
+
+const sweep = (
+  board: Int32Array,
+  status: Int32Array,
+  col: number,
+  row: number,
+  cell: { x: number; y: number }
+): boolean => {
+  board[cell.y * col + cell.x] = 8
+  status[cell.y * col + cell.x] = 1
+
+  return false
+}
+
+export { setMines, flag, sweep }
