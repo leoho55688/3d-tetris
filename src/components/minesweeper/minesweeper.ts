@@ -74,14 +74,21 @@ const flag = (
   status: Int32Array,
   width: number,
   height: number,
-  cell: { x: number; y: number }
-) => {
+  cell: { x: number; y: number },
+  numOfMines: number
+): number => {
   const index = getIndex(width, cell)
   if (status[index] === 0) {
+    console.log('0')
     status[getIndex(width, cell)] = 2
+    return numOfMines - 1
   } else if (status[index] === 2) {
+    console.log('2')
     status[getIndex(width, cell)] = 0
+    return numOfMines + 1
   }
+  console.log('1')
+  return 0
 }
 
 const sweep = (
@@ -102,34 +109,34 @@ const sweep = (
   } else if (board[index] === 0) {
     // left & right
     if (index % width !== 0) {
-      sweep(board, status, width, height, { x: cell.x-1, y: cell.y })
+      sweep(board, status, width, height, { x: cell.x - 1, y: cell.y })
     }
     if (index % width !== width - 1) {
-      sweep(board, status, width, height, { x: cell.x+1, y: cell.y })
+      sweep(board, status, width, height, { x: cell.x + 1, y: cell.y })
     }
     // bottom & top
     if (index / width !== 0) {
-      sweep(board, status, width, height, { x: cell.x, y: cell.y-1 })
+      sweep(board, status, width, height, { x: cell.x, y: cell.y - 1 })
     }
     if (index / width !== height - 1) {
-      sweep(board, status, width, height, { x: cell.x, y: cell.y+1 })
+      sweep(board, status, width, height, { x: cell.x, y: cell.y + 1 })
     }
     // four corners
     // bottom-left
     if (index % width !== 0 && index / width !== 0) {
-      sweep(board, status, width, height, { x: cell.x-1, y: cell.y-1 })
+      sweep(board, status, width, height, { x: cell.x - 1, y: cell.y - 1 })
     }
     // bottom-right
     if (index % width !== width - 1 && index / width !== 0) {
-      sweep(board, status, width, height, { x: cell.x+1, y: cell.y-1 })
+      sweep(board, status, width, height, { x: cell.x + 1, y: cell.y - 1 })
     }
     // top-left
     if (index % width !== 0 && index / width !== height - 1) {
-      sweep(board, status, width, height, { x: cell.x-1, y: cell.y+1 })
+      sweep(board, status, width, height, { x: cell.x - 1, y: cell.y + 1 })
     }
     // top-right
     if (index % width !== width - 1 && index / width !== height - 1) {
-      sweep(board, status, width, height, { x: cell.x+1, y: cell.y+1 })
+      sweep(board, status, width, height, { x: cell.x + 1, y: cell.y + 1 })
     }
   }
 

@@ -30,6 +30,16 @@ const initWebGPU = async (
   return Ok({ device, context, format })
 }
 
+const resizeCanvas = (canvas: HTMLCanvasElement) => {
+  const devicePixelRatio = window.devicePixelRatio || 1
+  const presentationSize = {
+    width: canvas.clientWidth * devicePixelRatio,
+    height: canvas.clientHeight * devicePixelRatio,
+  }
+  canvas.width = presentationSize.width
+  canvas.height = presentationSize.height
+}
+
 const loadTexture = async (device: GPUDevice, url: string) => {
   const response = await fetch(url)
   if (!response.ok)
@@ -58,4 +68,4 @@ const loadTexture = async (device: GPUDevice, url: string) => {
   return texture
 }
 
-export { initWebGPU, loadTexture }
+export { initWebGPU, resizeCanvas, loadTexture }

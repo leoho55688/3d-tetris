@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { initWebGPU } from '@/utils/webgpu'
+  import { initWebGPU, resizeCanvas } from '@/utils/webgpu'
   import { mat4 } from 'wgpu-matrix'
   import {
     cubePositionOffset,
@@ -38,7 +38,7 @@
   let { clearedLines = $bindable() } = $props()
   let gameOver = $state(false)
 
-  let cubeCanvas: HTMLCanvasElement | undefined = $state()
+  let cubeCanvas: HTMLCanvasElement | null = $state(null)
   let errorMessage: string | null = $state(null)
 
   let touchStartX = 0
@@ -152,6 +152,11 @@
     let animationFrameId: number
 
     const main = async () => {
+      if (!cubeCanvas) {
+        errorMessage = 'cannot find canvas element'
+        return
+      }
+
       const gpuResult = await initWebGPU(cubeCanvas!)
       if (!gpuResult.ok) {
         errorMessage = gpuResult.error.message
@@ -160,13 +165,7 @@
       }
 
       const { device, context, format } = gpuResult.value
-      const devicePixelRatio = window.devicePixelRatio || 1
-      const presentationSize = {
-        width: cubeCanvas!.clientWidth * devicePixelRatio,
-        height: cubeCanvas!.clientHeight * devicePixelRatio,
-      }
-      cubeCanvas!.width = presentationSize.width
-      cubeCanvas!.height = presentationSize.height
+      resizeCanvas(cubeCanvas)
       context.configure({ device, format, alphaMode: 'premultiplied' })
 
       const cubeVertexBuffer = device.createBuffer({

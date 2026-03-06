@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { initWebGPU, loadTexture } from '@/utils/webgpu'
+  import { initWebGPU, loadTexture, resizeCanvas } from '@/utils/webgpu'
   import { IsMobile } from '$lib/hooks/is-mobile'
 
   import { flag, setMines, sweep } from './minesweeper'
@@ -10,9 +10,11 @@
   import cellFrag from './shaders/cell.frag.wgsl?raw'
 
   const isMobile = new IsMobile()
-  const MINE_SIZE = isMobile.current? 32: 48
+  const MINE_SIZE = isMobile.current ? 32 : 48
 
   let { numOfMines = $bindable() } = $props()
+  let mineSwept = $state(0)
+  let gameClear = $state(false)
   let gameOver = $state(false)
 
   let mineCanvas: HTMLCanvasElement | null = $state(null)
@@ -24,7 +26,9 @@
   let BOARD_ROW = $derived(canvasHeight / MINE_SIZE)
 
   let gridArray = $derived(new Float32Array([BOARD_COL, BOARD_ROW]))
+  // -1: mine, 0-8: number of surrounding mines
   let mineBoardArray = $derived(new Int32Array(BOARD_COL * BOARD_ROW))
+  // 0: not searched, 1: searched, 2: flagged
   let cellStatusArray = $derived(new Int32Array(BOARD_COL * BOARD_ROW))
 
   function handleInteraction(clientX: number, clientY: number, button: number) {
@@ -41,7 +45,9 @@
     const canvasY = y * scaleY
 
     const offsetX = Math.floor(canvasX / MINE_SIZE / scaleX)
-    const offsetY = Math.floor((mineCanvas.height - canvasY) / MINE_SIZE / scaleY)
+    const offsetY = Math.floor(
+      (mineCanvas.height - canvasY) / MINE_SIZE / scaleY
+    )
 
     switch (button) {
       case 0: // sweep
@@ -61,10 +67,21 @@
           BOARD_ROW,
           { x: offsetX, y: offsetY }
         )
+        ++mineSwept
+        if (
+          mineSwept ===
+          mineBoardArray.length - Math.floor(mineBoardArray.length / 5)
+        )
+          gameClear = true
         break
       case 1: // flag (middle-click or long-press)
-        flag(cellStatusArray, BOARD_COL, BOARD_ROW, { x: offsetX, y: offsetY })
-        --numOfMines
+        numOfMines = flag(
+          cellStatusArray,
+          BOARD_COL,
+          BOARD_ROW,
+          { x: offsetX, y: offsetY },
+          numOfMines
+        )
       case 2: // flag (right-click)
         break
       default:
@@ -126,13 +143,7 @@
       }
 
       const { device, context, format } = gpuResult.value
-      const devicePixelRatio = window.devicePixelRatio || 1
-      const presentationSize = {
-        width: mineCanvas.clientWidth * devicePixelRatio,
-        height: mineCanvas.clientHeight * devicePixelRatio,
-      }
-      mineCanvas.width = presentationSize.width
-      mineCanvas.height = presentationSize.height
+      resizeCanvas(mineCanvas)
       context.configure({ device, format, alphaMode: 'opaque' })
 
       const gridBuffer = device.createBuffer({
@@ -301,6 +312,13 @@
       class="mask bg-[(0, 0, 0, 0.5)] xs-w-80 sm-w-88 absolute inset-2.5 z-1 flex h-176 w-72 items-center justify-center backdrop-blur-sm lg:h-192 lg:w-192"
     >
       <div class="message text-4xl font-bold text-white">Game Over</div>
+    </div>
+  {/if}
+  {#if gameClear}
+    <div
+      class="mask bg-[(0, 0, 0, 0.5)] xs-w-80 sm-w-88 absolute inset-2.5 z-1 flex h-176 w-72 items-center justify-center backdrop-blur-sm lg:h-192 lg:w-192"
+    >
+      <div class="message text-4xl font-bold text-white">Game Clear</div>
     </div>
   {/if}
   {#if errorMessage}
