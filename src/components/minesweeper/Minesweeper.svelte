@@ -2,11 +2,15 @@
   import { onMount } from 'svelte'
 
   import { initWebGPU, loadTexture } from '@/utils/webgpu'
+  import { IsMobile } from '$lib/hooks/is-mobile'
 
   import { flag, setMines, sweep } from './minesweeper'
   import { cellVertexArray } from './mine'
   import cellVert from './shaders/cell.vert.wgsl?raw'
   import cellFrag from './shaders/cell.frag.wgsl?raw'
+
+  const isMobile = new IsMobile()
+  const MINE_SIZE = isMobile.current? 32: 48
 
   let { numOfMines = $bindable() } = $props()
   let gameOver = $state(false)
@@ -16,8 +20,8 @@
   let canvasHeight = $state(0)
   let errorMessage: string | null = $state(null)
 
-  let BOARD_COL = $derived(canvasWidth / 24)
-  let BOARD_ROW = $derived(canvasHeight / 24)
+  let BOARD_COL = $derived(canvasWidth / MINE_SIZE)
+  let BOARD_ROW = $derived(canvasHeight / MINE_SIZE)
 
   let gridArray = $derived(new Float32Array([BOARD_COL, BOARD_ROW]))
   let mineBoardArray = $derived(new Int32Array(BOARD_COL * BOARD_ROW))
@@ -36,8 +40,8 @@
     const canvasX = x * scaleX
     const canvasY = y * scaleY
 
-    const offsetX = Math.floor(canvasX / 24 / scaleX)
-    const offsetY = Math.floor((mineCanvas.height - canvasY) / 24 / scaleY)
+    const offsetX = Math.floor(canvasX / MINE_SIZE / scaleX)
+    const offsetY = Math.floor((mineCanvas.height - canvasY) / MINE_SIZE / scaleY)
 
     switch (button) {
       case 0: // sweep
@@ -290,11 +294,11 @@
 </script>
 
 <div
-  class="mine-container xs-w-89 sm-w-95 relative h-185 w-83 bg-black p-2.5 lg:h-197 lg:w-197"
+  class="mine-container xs-w-85 sm-w-93 relative h-181 w-77 bg-black p-2.5 lg:h-197 lg:w-197"
 >
   {#if gameOver}
     <div
-      class="mask bg-[(0, 0, 0, 0.5)] xs-w-84 sm-w-90 absolute inset-2.5 z-1 flex h-180 w-78 items-center justify-center backdrop-blur-sm lg:h-192 lg:w-192"
+      class="mask bg-[(0, 0, 0, 0.5)] xs-w-80 sm-w-88 absolute inset-2.5 z-1 flex h-176 w-72 items-center justify-center backdrop-blur-sm lg:h-192 lg:w-192"
     >
       <div class="message text-4xl font-bold text-white">Game Over</div>
     </div>
