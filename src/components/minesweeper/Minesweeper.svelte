@@ -47,7 +47,7 @@
             BOARD_COL,
             BOARD_ROW,
             { x: offsetX, y: offsetY },
-            mineBoardArray.length / 5
+            numOfMines
           )
         }
         gameOver = sweep(
@@ -105,7 +105,7 @@
   }
 
   onMount(() => {
-    numOfMines = mineBoardArray.length / 5
+    numOfMines = Math.floor(mineBoardArray.length / 5)
     let animationFrameId: number
 
     const main = async () => {
