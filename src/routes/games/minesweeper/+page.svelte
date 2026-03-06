@@ -15,8 +15,11 @@
     <h1 class="m-4 text-4xl font-bold">
       {numOfMines} mines left!
     </h1>
+    <p class="m-4">texture designed by Rockpaperkatana</p>
   </div>
-  <div class="minesweeper-container flex items-center justify-center p-4 lg:grow-3">
+  <div
+    class="minesweeper-container flex items-center justify-center p-4 lg:grow-3"
+  >
     <Minesweeper bind:numOfMines />
   </div>
 </div>
