@@ -92,13 +92,45 @@ const sweep = (
   cell: { x: number; y: number }
 ): boolean => {
   const index = getIndex(width, cell)
-  if (status[index] === 2) {
+  if (status[index] !== 0) {
     return false
   }
 
   status[index] = 1
   if (board[index] === -1) {
     return true
+  } else if (board[index] === 0) {
+    // left & right
+    if (index % width !== 0) {
+      sweep(board, status, width, height, { x: cell.x-1, y: cell.y })
+    }
+    if (index % width !== width - 1) {
+      sweep(board, status, width, height, { x: cell.x+1, y: cell.y })
+    }
+    // bottom & top
+    if (index / width !== 0) {
+      sweep(board, status, width, height, { x: cell.x, y: cell.y-1 })
+    }
+    if (index / width !== height - 1) {
+      sweep(board, status, width, height, { x: cell.x, y: cell.y+1 })
+    }
+    // four corners
+    // bottom-left
+    if (index % width !== 0 && index / width !== 0) {
+      sweep(board, status, width, height, { x: cell.x-1, y: cell.y-1 })
+    }
+    // bottom-right
+    if (index % width !== width - 1 && index / width !== 0) {
+      sweep(board, status, width, height, { x: cell.x+1, y: cell.y-1 })
+    }
+    // top-left
+    if (index % width !== 0 && index / width !== height - 1) {
+      sweep(board, status, width, height, { x: cell.x-1, y: cell.y+1 })
+    }
+    // top-right
+    if (index % width !== width - 1 && index / width !== height - 1) {
+      sweep(board, status, width, height, { x: cell.x+1, y: cell.y+1 })
+    }
   }
 
   return false

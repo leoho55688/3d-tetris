@@ -8,7 +8,7 @@
   import cellVert from './shaders/cell.vert.wgsl?raw'
   import cellFrag from './shaders/cell.frag.wgsl?raw'
 
-  let { clearedMines = $bindable() } = $props()
+  let { numOfMines = $bindable() } = $props()
   let gameOver = $state(false)
 
   let mineCanvas: HTMLCanvasElement | null = $state(null)
@@ -41,13 +41,13 @@
 
     switch (button) {
       case 0: // sweep
-        if (cellStatusArray.every((state) => state === 0)) {
+        if (cellStatusArray.every((state) => state !== 1)) {
           setMines(
             mineBoardArray,
             BOARD_COL,
             BOARD_ROW,
             { x: offsetX, y: offsetY },
-            mineBoardArray.length / 4
+            mineBoardArray.length / 5
           )
         }
         gameOver = sweep(
@@ -60,6 +60,7 @@
         break
       case 1: // flag (middle-click or long-press)
         flag(cellStatusArray, BOARD_COL, BOARD_ROW, { x: offsetX, y: offsetY })
+        --numOfMines
       case 2: // flag (right-click)
         break
       default:
@@ -75,7 +76,7 @@
       touchTimer = window.setTimeout(() => {
         handleInteraction(e.clientX, e.clientY, 1)
         touchTimer = null
-      }, 500)
+      }, 300)
     } else {
       handleInteraction(e.clientX, e.clientY, e.button)
     }
@@ -99,9 +100,12 @@
     }
   }
 
-  const oncontextmenu = (e: MouseEvent) => {e.preventDefault()}
+  const oncontextmenu = (e: MouseEvent) => {
+    e.preventDefault()
+  }
 
   onMount(() => {
+    numOfMines = mineBoardArray.length / 5
     let animationFrameId: number
 
     const main = async () => {
@@ -286,11 +290,11 @@
 </script>
 
 <div
-  class="mine-container relative w-83 xs-w-89 h-185 sm-w-95 bg-black p-2.5 lg:h-197 lg:w-197"
+  class="mine-container xs-w-89 sm-w-95 relative h-185 w-83 bg-black p-2.5 lg:h-197 lg:w-197"
 >
   {#if gameOver}
     <div
-      class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex w-78 xs-w-84 h-180 sm-w-90 items-center justify-center backdrop-blur-sm lg:h-192 lg:w-192"
+      class="mask bg-[(0, 0, 0, 0.5)] xs-w-84 sm-w-90 absolute inset-2.5 z-1 flex h-180 w-78 items-center justify-center backdrop-blur-sm lg:h-192 lg:w-192"
     >
       <div class="message text-4xl font-bold text-white">Game Over</div>
     </div>
