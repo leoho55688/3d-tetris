@@ -23,7 +23,7 @@ fn main(input: VertexInput) -> VertexOutput {
         vec2f(1.0, 0.0),
     );
 
-    let adj_x = (input.pos.x - board.x + 1 + f32(input.instance_index) % board.x * 2) / board.x;
+    let adj_x = (input.pos.x - board.x + 1 + trunc(f32(input.instance_index) % board.x) * 2) / board.x;
     let adj_y = (input.pos.y - board.y + 1 + trunc(f32(input.instance_index) / board.x) * 2) / board.y;
 
     var out: VertexOutput;

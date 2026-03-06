@@ -7,8 +7,6 @@
   import { cellVertexArray } from './mine'
   import cellVert from './shaders/cell.vert.wgsl?raw'
   import cellFrag from './shaders/cell.frag.wgsl?raw'
-  import gridVert from './shaders/grid.vert.wgsl?raw'
-  import gridFrag from './shaders/grid.frag.wgsl?raw'
 
   let { clearedMines = $bindable() } = $props()
   let gameOver = $state(false)
@@ -40,15 +38,6 @@
 
     const offsetX = Math.floor(canvasX / 24 / scaleX)
     const offsetY = Math.floor((mineCanvas.height - canvasY) / 24 / scaleY)
-
-    console.log("x: " + x)
-    console.log("y: " + y)
-    console.log("scaleX: " + scaleX)
-    console.log("scaleY: " + scaleY)
-    console.log("canvasX: " + canvasX)
-    console.log("canvasY: " + canvasY)
-    console.log("offsetX: " + offsetX)
-    console.log("offsetY: " + offsetY)
 
     switch (button) {
       case 0: // sweep
@@ -223,21 +212,6 @@
         ],
       })
 
-      const gridPipeline = device.createRenderPipeline({
-        label: 'grid pipeline',
-        layout: 'auto',
-        vertex: {
-          module: device.createShaderModule({ code: gridVert }),
-        },
-        fragment: {
-          module: device.createShaderModule({ code: gridFrag }),
-          targets: [{ format }],
-        },
-        primitive: {
-          topology: 'triangle-list',
-        },
-      })
-
       const pipelineLayout = device.createPipelineLayout({
         label: 'cell pipeline layout',
         bindGroupLayouts: [bindGroupLayout, textureBindGroupLayout],
@@ -287,8 +261,6 @@
 
         const commandEncoder = device.createCommandEncoder()
         const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor)
-        passEncoder.setPipeline(gridPipeline)
-        passEncoder.draw(3)
         passEncoder.setPipeline(cellPipeline)
         passEncoder.setBindGroup(0, uniformBindGroup)
         passEncoder.setBindGroup(1, textureBindGroup)
@@ -314,11 +286,11 @@
 </script>
 
 <div
-  class="mine-container relative h-185 w-95 bg-black p-2.5 lg:h-197 lg:w-197"
+  class="mine-container relative w-83 xs-w-89 h-185 sm-w-95 bg-black p-2.5 lg:h-197 lg:w-197"
 >
   {#if gameOver}
     <div
-      class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex h-180 w-90 items-center justify-center backdrop-blur-sm lg:h-192 lg:w-192"
+      class="mask bg-[(0, 0, 0, 0.5)] absolute inset-2.5 z-1 flex w-78 xs-w-84 h-180 sm-w-90 items-center justify-center backdrop-blur-sm lg:h-192 lg:w-192"
     >
       <div class="message text-4xl font-bold text-white">Game Over</div>
     </div>
