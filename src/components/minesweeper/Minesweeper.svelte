@@ -3,7 +3,7 @@
 
   import { initWebGPU, loadTexture } from '@/utils/webgpu'
 
-  import { setMines, sweep } from './minesweeper'
+  import { flag, setMines, sweep } from './minesweeper'
   import { cellVertexArray } from './mine'
   import cellVert from './shaders/cell.vert.wgsl?raw'
   import cellFrag from './shaders/cell.frag.wgsl?raw'
@@ -25,14 +25,42 @@
   let mineBoardArray = $derived(new Int32Array(BOARD_COL * BOARD_ROW))
   let cellStatusArray = $derived(new Int32Array(BOARD_COL * BOARD_ROW))
 
-  const onclick = (e: MouseEvent) => {
-    e.preventDefault()
+  function handleInteraction(clientX: number, clientY: number, button: number) {
+    if (!mineCanvas) return
 
-    const offsetX = Math.floor(e.offsetX / 24)
-    const offsetY = Math.floor((768 - e.offsetY) / 24)
+    const rect = mineCanvas.getBoundingClientRect()
+    const x = clientX - rect.left
+    const y = clientY - rect.top
 
-    switch (e.button) {
-      case 0:
+    const scaleX = mineCanvas.width / rect.width
+    const scaleY = mineCanvas.height / rect.height
+
+    const canvasX = x * scaleX
+    const canvasY = y * scaleY
+
+    const offsetX = Math.floor(canvasX / 24 / scaleX)
+    const offsetY = Math.floor((mineCanvas.height - canvasY) / 24 / scaleY)
+
+    console.log("x: " + x)
+    console.log("y: " + y)
+    console.log("scaleX: " + scaleX)
+    console.log("scaleY: " + scaleY)
+    console.log("canvasX: " + canvasX)
+    console.log("canvasY: " + canvasY)
+    console.log("offsetX: " + offsetX)
+    console.log("offsetY: " + offsetY)
+
+    switch (button) {
+      case 0: // sweep
+        if (cellStatusArray.every((state) => state === 0)) {
+          setMines(
+            mineBoardArray,
+            BOARD_COL,
+            BOARD_ROW,
+            { x: offsetX, y: offsetY },
+            mineBoardArray.length / 4
+          )
+        }
         gameOver = sweep(
           mineBoardArray,
           cellStatusArray,
@@ -41,14 +69,48 @@
           { x: offsetX, y: offsetY }
         )
         break
-      case 1:
-        break
-      case 2:
+      case 1: // flag (middle-click or long-press)
+        flag(cellStatusArray, BOARD_COL, BOARD_ROW, { x: offsetX, y: offsetY })
+      case 2: // flag (right-click)
         break
       default:
         break
     }
   }
+
+  let touchTimer: number | null = null
+
+  const onpointerdown = (e: PointerEvent) => {
+    e.preventDefault()
+    if (e.pointerType === 'touch') {
+      touchTimer = window.setTimeout(() => {
+        handleInteraction(e.clientX, e.clientY, 1)
+        touchTimer = null
+      }, 500)
+    } else {
+      handleInteraction(e.clientX, e.clientY, e.button)
+    }
+  }
+
+  const onpointerup = (e: PointerEvent) => {
+    e.preventDefault()
+    if (e.pointerType === 'touch') {
+      if (touchTimer) {
+        clearTimeout(touchTimer)
+        touchTimer = null
+        handleInteraction(e.clientX, e.clientY, 0)
+      }
+    }
+  }
+
+  const onpointerleave = (e: PointerEvent) => {
+    if (touchTimer) {
+      clearTimeout(touchTimer)
+      touchTimer = null
+    }
+  }
+
+  const oncontextmenu = (e: MouseEvent) => {e.preventDefault()}
 
   onMount(() => {
     let animationFrameId: number
@@ -88,13 +150,6 @@
         size: mineBoardArray.byteLength,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
       })
-      setMines(
-        mineBoardArray,
-        BOARD_COL,
-        BOARD_ROW,
-        { x: 0, y: 0 },
-        mineBoardArray.length / 4
-      )
 
       const cellStateBuffer = device.createBuffer({
         label: 'cell status buffer',
@@ -276,7 +331,10 @@
       bind:this={mineCanvas}
       bind:clientWidth={canvasWidth}
       bind:clientHeight={canvasHeight}
-      {onclick}
+      {onpointerdown}
+      {onpointerup}
+      {onpointerleave}
+      {oncontextmenu}
     ></canvas>
   {/if}
 </div>
