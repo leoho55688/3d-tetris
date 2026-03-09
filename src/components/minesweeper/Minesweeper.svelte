@@ -4,7 +4,7 @@
   import { initWebGPU, loadTexture, resizeCanvas } from '@/utils/webgpu'
   import { IsMobile } from '$lib/hooks/is-mobile'
 
-  import { flag, setMines, sweep } from './minesweeper'
+  import { checkGameClear, flag, setMines, sweep } from './minesweeper'
   import { cellVertexArray } from './mine'
   import cellVert from './shaders/cell.vert.wgsl?raw'
   import cellFrag from './shaders/cell.frag.wgsl?raw'
@@ -67,12 +67,7 @@
           BOARD_ROW,
           { x: offsetX, y: offsetY }
         )
-        ++mineSwept
-        if (
-          mineSwept ===
-          mineBoardArray.length - Math.floor(mineBoardArray.length / 5)
-        )
-          gameClear = true
+        gameClear = checkGameClear(mineBoardArray, cellStatusArray)
         break
       case 1: // flag (middle-click or long-press)
         numOfMines = flag(

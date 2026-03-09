@@ -78,17 +78,16 @@ const flag = (
   numOfMines: number
 ): number => {
   const index = getIndex(width, cell)
+  // if cell is unchecked and unflaged, then flag
   if (status[index] === 0) {
-    console.log('0')
     status[getIndex(width, cell)] = 2
     return numOfMines - 1
+  // if cell is unchecked and flaged, then unflag
   } else if (status[index] === 2) {
-    console.log('2')
     status[getIndex(width, cell)] = 0
     return numOfMines + 1
   }
-  console.log('1')
-  return 0
+  return numOfMines
 }
 
 const sweep = (
@@ -99,13 +98,16 @@ const sweep = (
   cell: { x: number; y: number }
 ): boolean => {
   const index = getIndex(width, cell)
+  // return if cell is flaged or checked
   if (status[index] !== 0) {
     return false
   }
 
   status[index] = 1
+  // if the cell is mine, return gameover
   if (board[index] === -1) {
     return true
+  // if the cell has 0 mines surround, check the surrounding 8 cells
   } else if (board[index] === 0) {
     // left & right
     if (index % width !== 0) {
@@ -143,4 +145,12 @@ const sweep = (
   return false
 }
 
-export { setMines, flag, sweep }
+const checkGameClear = (board: Int32Array, status: Int32Array) => {
+  const n = board.length
+  for (let i = 0; i < n; ++i) {
+    if (board[i] !== -1 && status[i] !== 1) return false
+  }
+  return true
+}
+
+export { setMines, flag, sweep, checkGameClear }
