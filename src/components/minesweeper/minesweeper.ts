@@ -82,7 +82,7 @@ const flag = (
   if (status[index] === 0) {
     status[getIndex(width, cell)] = 2
     return numOfMines - 1
-  // if cell is unchecked and flaged, then unflag
+    // if cell is unchecked and flaged, then unflag
   } else if (status[index] === 2) {
     status[getIndex(width, cell)] = 0
     return numOfMines + 1
@@ -107,7 +107,7 @@ const sweep = (
   // if the cell is mine, return gameover
   if (board[index] === -1) {
     return true
-  // if the cell has 0 mines surround, check the surrounding 8 cells
+    // if the cell has 0 mines surround, check the surrounding 8 cells
   } else if (board[index] === 0) {
     // left & right
     if (index % width !== 0) {

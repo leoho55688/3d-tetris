@@ -171,17 +171,17 @@
         entries: [
           {
             binding: 0,
-            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+            visibility: GPUShaderStage.VERTEX,
             buffer: { type: 'uniform' },
           },
           {
             binding: 1,
-            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+            visibility: GPUShaderStage.VERTEX,
             buffer: { type: 'read-only-storage' },
           },
           {
             binding: 2,
-            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+            visibility: GPUShaderStage.VERTEX,
             buffer: { type: 'read-only-storage' },
           },
         ],
