@@ -8,9 +8,9 @@
 </script>
 
 <ModeWatcher />
-<div class="flex min-h-screen flex-col">
+<div class="flex h-screen flex-col overflow-hidden">
   <Header />
-  <main class="flex grow flex-col items-center justify-center">
+  <main class="flex grow flex-col items-center justify-center overflow-hidden">
     {#if children}
       {@render children()}
     {:else}

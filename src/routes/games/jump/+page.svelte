@@ -6,6 +6,6 @@
   <title>Jump</title>
 </svelte:head>
 
-<div class="container flex grow self-stretch">
+<div class="flex h-full w-full">
   <PlatformJumper />
 </div>
