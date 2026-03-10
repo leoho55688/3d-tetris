@@ -6,6 +6,6 @@
   <title>Jump</title>
 </svelte:head>
 
-<div class="flex h-full w-full">
+<div class="flex h-full w-full overflow-hidden">
   <PlatformJumper />
 </div>

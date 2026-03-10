@@ -8,11 +8,13 @@
 </script>
 
 <ModeWatcher />
-<div class="flex h-screen flex-col overflow-hidden">
+<div class="flex h-screen flex-col">
   <Header />
   <main class="flex grow flex-col items-center justify-center overflow-hidden">
     {#if children}
-      {@render children()}
+      <div class="w-full h-full overflow-auto">
+        {@render children()}
+      </div>
     {:else}
       <p>404 Not Found</p>
     {/if}
