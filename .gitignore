@@ -26,3 +26,12 @@ dist-ssr
 
 blueprint.md
 GEMINI.md
+# Cloudflare Types
+/worker-configuration.d.ts
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
